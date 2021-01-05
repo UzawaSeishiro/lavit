@@ -73,7 +73,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 	public JButton stateProfilerButton;
 	public JButton slimButton;
 	public JButton sviewerButton;
-	public JButton svwithsccButton;
 	public JButton svporButton;
 	public JButton nullButton;
 	public JButton killButton;
@@ -109,10 +108,6 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 		sviewerButton = new JButton(Env.getMsg(MsgID.button_stateviewer));
 		sviewerButton.addActionListener(this);
 		buttonPanel.add(sviewerButton);
-
-//		svwithsccButton = new JButton(Env.getMsg(MsgID.button_stateviewerwithscc));
-//		svwithsccButton.addActionListener(this);
-//		buttonPanel.add(svwithsccButton);
 
 		// svporButton = new JButton("(POR)"+Lang.m[15]);
 		svporButton = new JButton("");
@@ -318,11 +313,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.println("(StateViewer) Doing...");
 			String opt = "";
 			if (Env.is("SLIM2")) {
-				if (Env.get("SV_OPTION").contains("--with-scc")) {
-					opt = "--nd -t --with-scc";
-				} else {
-					opt = "--nd -t --dump-lavit " + Env.get("SV_OPTION");
-				}
+				opt = "--nd -t --dump-lavit " + Env.get("SV_OPTION");
 			} else {
 				opt = "--nd " + Env.get("SV_OPTION");
 				if (!Env.get("SV_DEPTH_LIMIT").equals("unset")) {
