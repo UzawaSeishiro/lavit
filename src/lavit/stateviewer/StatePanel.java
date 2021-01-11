@@ -60,6 +60,7 @@ public class StatePanel extends JPanel {
 
 	private String originalString;
 	private boolean ltlMode;
+	private boolean graphID;
 	private StateNodeSet drawNodes;
 
 	public StatePanel() {
@@ -86,10 +87,11 @@ public class StatePanel extends JPanel {
 		 */
 	}
 
-	public void start(String str, boolean ltlMode) {
+	public void start(String str, boolean ltlMode, boolean graphID) {
 
 		this.originalString = str;
 		this.ltlMode = ltlMode;
+		this.graphID = graphID;
 		this.drawNodes = new StateNodeSet(stateGraphPanel);
 
 		FrontEnd.println("(StateViewer) parsing.");
@@ -112,7 +114,7 @@ public class StatePanel extends JPanel {
 	}
 
 	public void reset() {
-		start(originalString, ltlMode);
+		start(originalString, ltlMode, graphID);
 	}
 
 	public void savaFile(File file) {

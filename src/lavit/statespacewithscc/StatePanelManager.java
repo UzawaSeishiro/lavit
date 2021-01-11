@@ -53,15 +53,15 @@ public class StatePanelManager {
     }
 
     public void ShowStateSpace() {
-        FrontEnd.mainFrame.toolTab.statePanel.start(statespace, false, false);
+        FrontEnd.mainFrame.toolTab.statePanel.start(statespace, false, 0);
     }
 
     public void ShowSCCGraph() {
-        FrontEnd.mainFrame.toolTab.statePanel.start(sccgraph, false, false);
+        FrontEnd.mainFrame.toolTab.statePanel.start(sccgraph, false, 1);
     }
 
     public void ShowSCCInternalGraph(int SCCNodeID) {
-        FrontEnd.mainFrame.toolTab.statePanel.start(sccinternalgraph[SCCNodeID], false, false);
+        FrontEnd.mainFrame.toolTab.statePanel.start(sccinternalgraph[SCCNodeID], false, SCCNodeID);
     }
 
     /**
