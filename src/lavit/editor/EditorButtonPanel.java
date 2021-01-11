@@ -58,6 +58,7 @@ import lavit.localizedtext.MsgID;
 import lavit.runner.*;
 import lavit.util.FileUtils;
 import lavit.util.StringUtils;
+import lavit.statespacewithscc.StatePanelManager;
 
 @SuppressWarnings("serial")
 public class EditorButtonPanel extends JPanel implements ActionListener {
@@ -110,9 +111,9 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 		sviewerButton.addActionListener(this);
 		buttonPanel.add(sviewerButton);
 
-//		svwithsccButton = new JButton(Env.getMsg(MsgID.button_stateviewerwithscc));
-//		svwithsccButton.addActionListener(this);
-//		buttonPanel.add(svwithsccButton);
+		svwithsccButton = new JButton("StateViewer-with-SCC");
+		svwithsccButton.addActionListener(this);
+		buttonPanel.add(svwithsccButton);
 
 		// svporButton = new JButton("(POR)"+Lang.m[15]);
 		svporButton = new JButton("");
@@ -142,6 +143,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 		grapheneButton.setEnabled(enable);
 		slimButton.setEnabled(enable);
 		sviewerButton.setEnabled(enable);
+		svwithsccButton.setEnabled(enable);
 		svporButton.setEnabled(enable);
 		stateProfilerButton.setEnabled(enable);
 
@@ -318,11 +320,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 			FrontEnd.println("(StateViewer) Doing...");
 			String opt = "";
 			if (Env.is("SLIM2")) {
-				if (Env.get("SV_OPTION").contains("--with-scc")) {
-					opt = "--nd -t --with-scc";
-				} else {
-					opt = "--nd -t --dump-lavit " + Env.get("SV_OPTION");
-				}
+				opt = "--nd -t --dump-lavit " + Env.get("SV_OPTION");
 			} else {
 				opt = "--nd " + Env.get("SV_OPTION");
 				if (!Env.get("SV_DEPTH_LIMIT").equals("unset")) {
@@ -340,7 +338,7 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 					}
 					FrontEnd.println("(SLIM) Done! [" + (slimRunner.getTime() / 1000.0) + "s]");
 					if (slimRunner.isSucceeded()) {
-						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false);
+						FrontEnd.mainFrame.toolTab.statePanel.start(slimRunner.getBufferString(), false, false);
 					}
 					slimRunner = null;
 					SwingUtilities.invokeLater(new Runnable() {
@@ -350,6 +348,42 @@ public class EditorButtonPanel extends JPanel implements ActionListener {
 					});
 				}
 			}.start();
+		} else if (src == svwithsccButton) {
+			setButtonEnable(false);
+
+			FrontEnd.mainFrame.toolTab.setTab("System");
+
+			if (Env.is("SLIM2")) {
+				FrontEnd.println("(StateViewer-with-SCC) Doing...");
+				String opt = "";
+				opt = "--nd -t --with-scc ";
+
+				boolean runOnlySlim = editorPanel.getFileName().endsWith(".il");
+				slimRunner = new SlimRunner(opt, runOnlySlim);
+				slimRunner.setBuffering(true);
+				slimRunner.run();
+				new Thread() {
+					public void run() {
+						while (slimRunner.isRunning()) {
+							FrontEnd.sleep(200);
+						}
+						FrontEnd.println("(SLIM) Done! [" + (slimRunner.getTime() / 1000.0) + "s]");
+						if (slimRunner.isSucceeded()) {
+							StatePanelManager statepanelmanager = new StatePanelManager(slimRunner.getBufferString());
+							statepanelmanager.start();
+						}
+						slimRunner = null;
+						SwingUtilities.invokeLater(new Runnable() {
+							public void run() {
+								setButtonEnable(true);
+							}
+						});
+					}
+				}.start();
+			} else {
+				FrontEnd.println("(StateViewer-with-SCC) Only Enabled with SLIM2");
+				setButtonEnable(true);
+			}
 		} else if (src == svporButton) {
 			/*
 			 * if(editorPanel.isChanged()){ editorPanel.fileSave(); }
